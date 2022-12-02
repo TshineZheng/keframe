@@ -1,6 +1,6 @@
 import 'package:flutter/cupertino.dart';
-import 'frame_separate_task.dart';
 
+import 'frame_separate_task.dart';
 import 'logcat.dart';
 import 'notification.dart';
 
@@ -8,9 +8,11 @@ import 'notification.dart';
 /// @date     5/7/21 2:13 PM
 /// @desc    <int,Size> > Cache child node information
 class SizeCacheWidget extends StatefulWidget {
-  const SizeCacheWidget({Key? key, required this.child, this.estimateCount = 0})
+  const SizeCacheWidget({Key? key, required this.child, this.estimateCount = 0, this.ignoreZeroSize = false})
       : super(key: key);
   final Widget child;
+
+  final bool ignoreZeroSize;
 
   /// Estimate the number of children on the screen, which is used to set the size of the frame queue
   /// Optimizes the list of items on the current screen for delayed response in fast scrolling scenarios
@@ -46,6 +48,10 @@ class SizeCacheWidgetState extends State<SizeCacheWidget> {
       builder: (BuildContext ctx) {
         return NotificationListener<LayoutInfoNotification>(
           onNotification: (LayoutInfoNotification notification) {
+            if(widget.ignoreZeroSize){
+              if(notification.size.width == 0 || notification.size.height == 0)
+              return true;
+            }
             logcat(
                 'size info :  index = ${notification.index}  size = ${notification.size.toString()}');
             saveLayoutInfo(notification.index, notification.size);
